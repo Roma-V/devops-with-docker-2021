@@ -1,0 +1,28 @@
+FROM golang:1.16 AS build-env
+
+WORKDIR /usr/src/app
+
+# Copy all of the content from the project to the image.
+COPY . .
+
+# CGO has to be disabled for alpine
+ENV CGO_ENABLED=0
+# Build the project
+RUN go build
+
+FROM alpine
+
+EXPOSE 8080
+
+WORKDIR /usr/src/app
+
+COPY --from=build-env /usr/src/app /usr/src/app
+
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/* && \
+# Add a non-root user
+    adduser -D appuser && \
+    chmod +x server
+
+USER appuser
+
+ENTRYPOINT [ "./server" ]

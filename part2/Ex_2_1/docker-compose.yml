@@ -1,0 +1,9 @@
+version: '3' 
+
+services: 
+    file-logger:  
+        image: romanmvasilyev/file-logger
+        build: . 
+        volumes: 
+            - ./text.log:/usr/src/app/text.log
+        container_name: file-logger

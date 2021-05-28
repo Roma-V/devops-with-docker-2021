@@ -1,0 +1,18 @@
+FROM node AS build-phase
+
+WORKDIR /usr/src/app
+
+# Copy all of the content from the project to the image.
+COPY . .
+
+# Install project packages.
+RUN npm install && \
+# Deploy
+    npm run build
+
+# Deploy with nginx ran by a non-root user
+# Note that it runs on port 8080
+FROM nginxinc/nginx-unprivileged:1.20-alpine
+
+# Copy all of the content from the project to the image.
+COPY --from=build-phase /usr/src/app/build/ /usr/share/nginx/html

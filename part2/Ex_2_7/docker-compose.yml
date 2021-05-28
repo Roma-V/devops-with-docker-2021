@@ -1,0 +1,32 @@
+version: '3' 
+
+services: 
+    ml-training:  
+        image: romanmvasilyev/ml-training
+        build: ./ml-kurkkumopo-training-master
+        volumes: 
+            - model:/src/model
+            - ./ml-kurkkumopo-training-master/data:/src/data
+            - ./ml-kurkkumopo-training-master/imgs:/src/imgs
+        container_name: ml-training
+
+    ml-backend:  
+        image: romanmvasilyev/ml-backend
+        build: ./ml-kurkkumopo-backend-master
+        volumes: 
+            - model:/src/model
+        container_name: ml-backend
+        depends_on: 
+            - ml-training
+    
+    ml-frontend:  
+        image: romanmvasilyev/ml-frontend
+        build: ./ml-kurkkumopo-frontend-master
+        ports: 
+            - 3000:3000
+        container_name: ml-frontend
+        depends_on: 
+            - ml-backend
+
+volumes:
+    model:

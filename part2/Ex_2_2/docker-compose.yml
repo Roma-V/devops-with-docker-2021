@@ -1,0 +1,8 @@
+version: '3.0'  
+
+services: 
+    web-server: 
+        image: devopsdockeruh/simple-web-service:alpine
+        ports: 
+            - 3000:8080 
+        command: server

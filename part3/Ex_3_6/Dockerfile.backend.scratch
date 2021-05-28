@@ -1,0 +1,29 @@
+FROM golang:1.16 AS build-env
+
+WORKDIR /usr/src/app
+
+# Copy all of the content from the project to the image.
+COPY . .
+
+# CGO has to be disabled for alpine
+ENV CGO_ENABLED=0
+# Build the project
+RUN go build && \
+# Add a non-root user
+    useradd -m appuser
+
+# Deploy with a scratch container
+FROM scratch
+
+EXPOSE 8080
+
+WORKDIR /usr/src/app
+
+# Copy the app
+COPY --from=build-env /usr/src/app/server /usr/src/app
+# Copy the non-root user, since we can not create it within scratch
+COPY --from=build-env /etc/passwd /etc/passwd
+
+USER appuser
+
+ENTRYPOINT [ "./server" ]
